@@ -1,0 +1,103 @@
+
+    {% extends 'base.html' %}
+    {% block ems_super  %}
+
+{#			<div id="top_content">#}
+{#					<div id="header">#}
+{#						<div id="rightheader">#}
+{#							<p>#}
+{#								2018/7/22#}
+{#								<br />#}
+{#							</p>#}
+{#						</div>#}
+{#						<div id="topheader">#}
+{#							<h1 id="title">#}
+{#								<a href="{% url 'index' %}">主页</a>#}
+{#							</h1>#}
+{#						</div>#}
+{#						<div id="navigation">#}
+{#						</div>#}
+{#					</div>#}
+{#				<div id="content">#}
+					<p id="whereami">
+					</p>
+					<h1>
+						更新员工信息:
+					</h1>
+					<form action="{% url 'emp:em:upc' %}" method="post">
+                        {% csrf_token %}
+						<table cellpadding="0" cellspacing="0" border="0"
+							class="form_table">
+							<tr>
+								<td valign="middle" align="right">
+									id:
+								</td>
+								<td valign="middle" align="left">
+									{{ emp.id }}
+                                    <input type="hidden" name="id" value="{{ emp.id }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									name:
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" class="inputgri" name="name" value="{{ emp.name }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									salary:
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" class="inputgri" name="salary" value="{{ emp.salary }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									age:
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" class="inputgri" name="age" value="{{ emp.age }}"/>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									gender:
+								</td>
+								<td valign="middle" align="left">
+									男<input type="radio" class="inputgri" name="gender" value="1"
+                                           {% if emp.gender %}  checked {% endif %}
+                                    />
+									女<input type="radio" class="inputgri" name="gender" value="0"
+                                             {% if not emp.gender %}  checked  {% endif %}
+                                    />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									birth:
+								</td>
+								<td valign="middle" align="left">
+									<input type="date" class="inputgri" name="birth" value="{{ emp.birth|date:'Y-m-d' }}"/>
+								</td>
+							</tr>
+                             <tr>
+                            <td valign="middle" align="right">
+                                上传头像:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="file" class="inputgri" name="hpic" value="{% static '' %}{{ emp.hpic.url }}"/>
+                                <img src="{% static '' %}{{ emp.hpic.url }}" style="width: 80px;border-radius: 45px;vertical-align: middle;margin-left: 20px;">
+                            </td>
+
+                        </tr>
+						</table>
+						<p>
+							<input type="submit" class="button" value="提交" />
+						</p>
+					</form>
+				</div>
+			</div>
+    {% endblock %}
+

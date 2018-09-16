@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../djProject/booksNet/.idea/booksNet.iml" filepath="$PROJECT_DIR$/../djProject/booksNet/.idea/booksNet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../djProject/django_ajax/.idea/django_ajax.iml" filepath="$PROJECT_DIR$/../djProject/django_ajax/.idea/django_ajax.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ems.iml" filepath="$PROJECT_DIR$/.idea/ems.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../djProject/ems2/.idea/ems2.iml" filepath="$PROJECT_DIR$/../djProject/ems2/.idea/ems2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../djProject/ems3/.idea/ems3.iml" filepath="$PROJECT_DIR$/../djProject/ems3/.idea/ems3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../djProject/library/.idea/library.iml" filepath="$PROJECT_DIR$/../djProject/library/.idea/library.iml" />
+    </modules>
+  </component>
+</project>

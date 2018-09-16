@@ -1,0 +1,217 @@
+
+{% extends 'base.html' %}
+{% block ems_super %}
+    {% load static %}
+    {#            上一页下一页样式设置#}
+    <style>
+        .a{
+            width:20px;
+            height: 20px;
+            border:1px solid #e1e2e3;
+            cursor:pointer;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
+        }
+        .b{
+            border:0;
+            width:20px;
+            height: 20px;
+            cursor:pointer;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
+        }
+        a{
+            text-decoration:none;
+        }
+        #selects{
+            margin: 0 auto;
+            text-align: center;
+            background: rgba(0, 0, 255, 0.18);
+            cursor: pointer;
+        }
+        #selects tr{
+            height: 20px;
+        }
+    </style>
+
+    <br>
+    <h1>
+        欢迎 {{username}}
+        {% if username %}
+        <img src="{% static '' %}{{ headpic }}" style="width: 50px;height: 50px;border-radius: 25px;margin-left: 10px;vertical-align: middle;">
+        {% endif %}
+    </h1>
+    <div style="margin: 0 auto;padding-top:19px;text-align: center;margin-bottom: 23px;">员工姓名<input id="c">
+        <input type="button" id="sec" value="搜索" onclick="showemp()">
+        <div style="display:none;border:1px solid gray;width:170px" id="selects">
+            <table style="width:170px" id="sec_t">
+                <tbody class="tb">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <table class="table" style="text-align: center">
+        <tr class="table_header">
+            <td>
+                ID
+            </td>
+            <td>
+                姓名
+            </td>
+            <td>
+                工资
+            </td>
+            <td>
+                年龄
+            </td>
+            <td>
+                性别
+            </td>
+            <td>
+                生日
+            </td>
+            <td>
+                头像
+            </td>
+            <td>
+                管理操作
+            </td>
+        </tr>
+
+        {% for emp in page.object_list %}
+        <tr
+                {% if forloop.counter|divisibleby:'2' %}
+                    class='row2'>
+                {% else %}
+                    class='row1'>
+                {% endif %}
+            <td> {{ emp.id }}</td>
+            <td> {{ emp.name }}</td>
+            <td> {{ emp.salary }}</td>
+            <td> {{ emp.age }}</td>
+            <td>
+                {% if emp.gender %}
+                     男
+                {% else %}
+                    女
+                {% endif %}
+            </td>
+            <td> {{ emp.birth|date:'Y-m-d' }}</td>
+            <td><img src="{% static '' %}{{ emp.hpic.url }}" style="width: 26px;height: 26px;border-radius: 14px;"></td>
+
+            <td>
+                <a href="javascript:void (0)" onclick="delemp({{ emp.id }},{{ page.number }} )">删除员工</a>&nbsp;
+                <a href="{% url 'emp:em:up' %}?id={{ emp.id }}">更新员工信息</a>
+            </td>
+        </tr>
+
+    {#   分页跳转链接             #}
+                {% endfor %}
+
+            </table>
+            <p style="text-align: right">
+                <a href="{% url 'emp:query' %}?num=1">首页</a>
+                    {% if page.has_previous %}
+                        <a href="{% url 'emp:query' %}?num={{ page.previous_page_number }}">上一页</a>
+                    {% endif %}
+
+                    {% for num in page.paginator.page_range %}
+                        <a href="{% url 'emp:query' %}?num={{ num }}">
+                            {% if num == page.number %}
+                                <span class="a">{{ num }}</span>
+                            {% else %}
+                                <span class="b">{{ num }}</span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+
+                    {% if page.has_next %}
+                        <a href="{% url 'emp:query' %}?num={{ page.next_page_number }}">下一页</a>
+                    {% endif %}
+                        <a href="{% url 'emp:query' %}?num={{ page.paginator.num_pages }}">尾页</a>
+            </p>
+            <p>
+                <input type="button" class="button" value="添加员工" onclick="location='{% url 'emp:em:add' %}'"/>
+            </p>
+        </div>
+    </div>
+
+<script src="{% static 'jquery-1.11.1.min.js' %}"></script>
+<script>
+
+{#删除确认#}
+        function delemp(id,num) {
+            var isdel = confirm('请是否确定删除？');
+            if (isdel){ location.href="{% url 'emp:em:del' %}?id="+id+'&num='+num}
+        }
+
+{#  搜索员工#}
+    var datas=['zhangsan'];
+    csrftoken = "{{ csrf_token }}";
+        //监听输入框的键盘(输入)事件
+    $("#c").keyup(function(e){
+        //清除提示框中的旧信息
+        $(".tb").empty();
+        //获取输入框中的文本
+        var txt=$("#c").val();
+        $.ajax({
+            type:"post",
+            url:"{% url 'emp:em:sec' %}",
+            data:"name="+txt+"&csrfmiddlewaretoken="+csrftoken,
+            success:function(a){
+                for(var i = 0;i< a.length;i++){
+                    datas.push(a[i].name);
+                    console.log('a[i]:',a[i].name)
+{#                    for(var j=0;j<datas.length;j++){#}
+{#                        if(datas[j] != a[i].name){datas.push(a[i].name);}#}
+{#                    }#}
+                }
+            },
+        dataType:'json',
+        });
+        console.log('datas:',datas);
+        if(txt.length >0 ){
+            //从数据源中检索相关数据
+            for(var i=0;i<datas.length;i++){
+                //验证数据源中的数据data[i]是否和用户输入的txt
+                if(datas[i].indexOf(txt)>=0){
+                    console.log('回显：',datas[i]);
+                    $(".tb").append("<tr>"+
+                                            "<td>"+datas[i]+"</td>"+
+                                       "</tr>"
+                    );
+                }
+            }
+            $("#selects").slideDown(200);
+        }else{
+            //隐藏提示框
+            $("#selects").hide();
+        }
+    });
+    //为提示框中的提示项增加效果
+    $(".tb").on("mouseover","tr",function(){
+        $(this).css("background-color","#abcdef");
+    });
+    $(".tb").on("mouseout","tr",function(){
+        $(this).css("background-color","#ffffff");
+    });
+    //为提示框中的提示项增加单击事件
+    $(".tb").on("click","tr",function(){
+        //将当前tr中的text设置给文本框
+        var msg=$(this).text();
+        $("#c").val(msg);
+        //隐藏提示框
+        $("#selects").hide();
+    });
+
+{#搜索员工请求#}
+    function showemp() {
+        var empname = $('#c').val();
+        location.href='{% url 'emp:query' %}?empname='+empname;
+    }
+
+    </script>
+    {% endblock %}

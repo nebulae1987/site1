@@ -1,0 +1,193 @@
+
+{% extends 'base.html' %}
+{% block ems_super %}
+        {% load static %}
+
+                <p id="whereami">
+                </p>
+                <h1>
+                    注册
+                </h1>
+                <form  id="forms" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <table cellpadding="0" cellspacing="0" border="0"
+                        class="form_table">
+                        <tr>
+                            <td valign="middle" align="right">
+                                用户名:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="text" class="inputgri" name="username" id="user" onblur="check_names(this)"/>
+                                <img  id="names"  width="15px" style="margin-left: 10px;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right">
+                                真实姓名:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="text" class="inputgri" name="realname" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right" >
+                                密码:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="password" class="inputgri" name="pwd" id="pwd"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right">
+                                年龄:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="text" class="inputgri" name="age" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right">
+                                性别:
+                            </td>
+                            <td valign="middle" align="left">
+                                男
+                                <input type="radio" class="inputgri" name="gender" value="1" checked="checked"/>
+                                女
+                                <input type="radio" class="inputgri" name="gender" value="0"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right">
+                                生日:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="date" class="inputgri" name="birth" id="birth"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="right">
+                                上传头像:
+                            </td>
+                            <td valign="middle" align="left">
+                                <input type="file" class="inputgri" name="hpic" />
+                            </td>
+                            <img  id="head" style="width: 100px;height: 100px;border-radius: 100px;border:0 ;float: right;margin-right: 100px"/>
+                        </tr>
+                        <tr>
+                            <td valign="middle" align="left">
+                                验证码:
+                            </td>
+                             <td valign="middle" align="right" >
+                                 <input type="text" class="inputgri" width="80px" name="mycode" id="mycode" onblur="check(this)"/>
+                                <img  id="tip"  width="15px" style="margin-left: 10px;margin-right: 10px;"/>
+                                <img id="num" src="{% url 'adm:ad:getCode' %}" width="50px"/>
+                                <a href="javascript:void(0);" onclick="change()">换一张</a>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p>
+                        <input type="button" class="button" value="提交" onclick="go_form()"/>
+                    </p>
+                </form>
+            </div>
+        </div>
+    <script src="{% static 'jquery-1.11.1.min.js' %}"></script>
+    <script>
+
+    function go_form(){
+        $.ajax({
+            type:"post",
+            url:"{% url 'adm:ad:regc' %}",
+            data:new FormData($("#forms").get(0)),
+            success:function(a){
+                 if(a.result){
+                        path = a.path;
+                        $("#head").attr("src","{% static '' %}"+path);
+                    }else{
+                        alert("提交注册失败");
+                    }
+                },
+            processData: false,
+            contentType: false,
+            dataType:'json',
+            });
+        window.setTimeout(function () {
+            location.href='{% url "adm:ad:log" %}';
+        },3000);
+
+    }
+
+        {#  换一张验证码     #}
+        function change() {
+            var url = "{% url 'adm:ad:getCode' %}?"+new Date().getTime()
+            $('#num').attr('src',url)
+        }
+        {# 异步验证用户输入验证码是否和服务器端生成验证码一致#}
+        function check(a) {
+             var xhr = new XMLHttpRequest()
+             xhr.open('get','{% url "adm:ad:checkCode"%}?mycode='+$(a).val() )
+             $("#tip").attr('src','{% static 'img/load.gif' %}');
+             xhr.send()
+            //监听
+             xhr.onreadystatechange = function(){
+                if(xhr.readyState==4 && xhr.status==200){    //请求成功，响应完整
+                    //响应接收,xhr会将响应存储在属性responseText中
+                    var ret=xhr.responseText;
+                    if( ret =='1'){
+                        $("#tip").attr('src','{% static 'img/ok.gif' %}');
+                    }else if(ret == '0'){
+                         $("#tip").attr('src','{% static 'img/error.jpg' %}');
+                    }
+                }
+             }
+        }
+{# 验证用户名是否存在#}
+        function check_names(b) {
+             var xhr = new XMLHttpRequest()
+             xhr.open('get','{% url "adm:ad:checkName"%}?name='+$(b).val() )
+             $("#names").attr('src','{% static 'img/load.gif' %}');
+             xhr.send()
+            //监听
+             xhr.onreadystatechange = function(){
+                if(xhr.readyState==4 && xhr.status==200){
+                    //响应接收,xhr会将响应存储在属性responseText中
+                    var ret=xhr.responseText;
+                    if(ret == '0'||  !$(b).val()){
+                         $("#names").attr('src','{% static 'img/error.jpg' %}');
+
+                    }else if( ret =='1'){
+                        $("#names").attr('src','{% static 'img/ok.gif' %}');
+                    }
+                }
+             }
+        }
+
+        {# 验证注册信息不能为空#}
+{#        function pwd_null(){#}
+{#            var pwd = document.getElementById('pwd');#}
+{#            var user = document.getElementById('user');#}
+{#            var birth = document.getElementById('birth');#}
+{#            var action = document.getElementById('forms');#}
+{#             if ( !user.value ){#}
+{#                 alert('亲，用户名不能为空！');#}
+{#                 action.action="#";#}
+{#            }else if(!pwd.value){#}
+{#                 alert('亲，密码不能为空！');#}
+{#                 action.action="#";#}
+{#             }else if((user.value).length<3){#}
+{#                 alert('亲，用户名不能少于3位！');#}
+{#                 action.action="#";#}
+{#             }else if((pwd.value).length<6){#}
+{#                 alert('亲，密码长度不能少于6位！');#}
+{#                 action.action="#";#}
+{#             }else if(!birth.value){#}
+{#                 alert('亲，生日不能为空！');#}
+{#                 action.action="#";#}
+{#             }#}
+{#        }#}
+    </script>
+
+{% endblock %}
+
+
